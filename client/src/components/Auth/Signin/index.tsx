@@ -12,7 +12,6 @@ import InputAdornment from "@mui/material/InputAdornment";
 import Checkbox from "@mui/material/Checkbox";
 import Button from "@mui/material/Button";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import Divider from "@mui/material/Divider";
 import Link from "next/link";
 import Image from "next/image";
 import Dialog from "@mui/material/Dialog";
@@ -24,12 +23,51 @@ const Signin = ({ open, onClose, switchToSignup }) => {
   const [isPasswordShown, setIsPasswordShown] = useState(false);
   const router = useRouter();
   const handleClickShowPassword = () => setIsPasswordShown((show) => !show);
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    router.push("/");
-    onClose();
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+
+    try {
+      const res = await fetch("http://127.0.0.1:8000/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.message || "Invalid credentials");
+      } else {
+        console.log("Login successful:", data);
+        localStorage.setItem("authToken", data.token);
+        localStorage.setItem("user", JSON.stringify(data.customer));
+
+        onClose();
+        router.push("/"); 
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <>
       <Dialog
@@ -83,11 +121,14 @@ const Signin = ({ open, onClose, switchToSignup }) => {
                   onSubmit={handleSubmit}
                   className="flex flex-col gap-5"
                 >
-                  <TextField autoFocus fullWidth label="Email" />
+                  <TextField autoFocus fullWidth label="Email" name="email" value={formData.email} onChange={handleChange} />
                   <TextField
                     fullWidth
                     label="Password"
                     id="outlined-adornment-password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
                     type={isPasswordShown ? "text" : "password"}
                     InputProps={{
                       endAdornment: (
@@ -124,6 +165,7 @@ const Signin = ({ open, onClose, switchToSignup }) => {
                       Forgot password?
                     </Typography>
                   </div>
+                  {error && <Typography color="error">{error}</Typography>}
                   <Button
                     fullWidth
                     variant="contained"

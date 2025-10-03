@@ -23,6 +23,51 @@ const Signup = ({ open, onClose, switchToSignin }) => {
   const darkImg = "/images/pages/auth-v1-mask-dark.png";
   const lightImg = "/images/pages/auth-v1-mask-light.png";
   const handleClickShowPassword = () => setIsPasswordShown((show) => !show);
+  const [formData, setFormData] = useState({
+    fname: "",
+    lname: "",
+    email: "",
+    contact: "",
+    password: ""
+  });
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+
+    try {
+      const res = await fetch("http://127.0.0.1:8000/api/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.message || "Something went wrong");
+      } else {
+        console.log("User registered:", data);
+        onClose();
+        switchToSignin();
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <>
       <Dialog
@@ -69,16 +114,19 @@ const Signup = ({ open, onClose, switchToSignin }) => {
             <form
               noValidate
               autoComplete="off"
-              onSubmit={(e) => e.preventDefault()}
+              onSubmit={handleSubmit}
               className="flex flex-col gap-5"
             >
-              <TextField autoFocus fullWidth label="First Name" />
-              <TextField autoFocus fullWidth label="Last Name" />
-              <TextField fullWidth label="Email" />
-              <TextField autoFocus fullWidth label="Contact Number" />
+              <TextField autoFocus fullWidth label="First Name" name="fname" value={formData.fname} onChange={handleChange}/>
+              <TextField autoFocus fullWidth label="Last Name" name="lname" value={formData.lname} onChange={handleChange} />
+              <TextField fullWidth label="Email" name="email" value={formData.email} onChange={handleChange}/>
+              <TextField autoFocus fullWidth label="Contact Number" name="contact" value={formData.contact} onChange={handleChange}/>
               <TextField
                 fullWidth
                 label="Password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
                 type={isPasswordShown ? "text" : "password"}
                 InputProps={{
                   endAdornment: (
@@ -114,6 +162,7 @@ const Signup = ({ open, onClose, switchToSignin }) => {
                   </>
                 }
               />
+              {error && <Typography color="error">{error}</Typography>}
               <Button 
               fullWidth 
               variant="contained"
