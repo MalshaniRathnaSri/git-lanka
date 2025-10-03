@@ -199,3 +199,12 @@ input[type='search']::-webkit-search-results-decoration {
 .range-slider__range {
   @apply !bg-blue;
 }
+
+.submitButton {
+  background-color: #8C57FF !important;
+  color: #fff !important;
+}
+.submitButton:hover {
+  background-color: #7546d1 !important;
+}
+

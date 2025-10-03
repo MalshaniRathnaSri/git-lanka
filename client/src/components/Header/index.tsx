@@ -9,15 +9,32 @@ import { useSelector } from "react-redux";
 import { selectTotalPrice } from "@/redux/features/cart-slice";
 import { useCartModalContext } from "@/app/context/CartSidebarModalContext";
 import Image from "next/image";
+import Button from "@mui/material/Button";
+import Signin from "../Auth/Signin";
+import Signup from "../Auth/Signup";
 
 const Header = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [navigationOpen, setNavigationOpen] = useState(false);
   const [stickyMenu, setStickyMenu] = useState(false);
   const { openCartModal } = useCartModalContext();
+  const [open, setOpen] = useState(false);
+  const [authForm, setAuthForm] = useState("signin");
 
   const product = useAppSelector((state) => state.cartReducer.items);
   const totalPrice = useSelector(selectTotalPrice);
+
+  const handleOpenSignin = () => {
+    setAuthForm("signin");
+    setOpen(true);
+  };
+
+  const handleOpenSignup = () => {
+    setAuthForm("signup");
+    setOpen(true);
+  };
+
+  const handleCloseModal = () => setOpen(false);
 
   const handleOpenCartModal = () => {
     openCartModal();
@@ -63,12 +80,17 @@ const Header = () => {
           {/* <!-- header top left --> */}
           <div className="xl:w-auto flex-col sm:flex-row w-full flex sm:justify-between sm:items-center gap-5 sm:gap-10">
             <Link className="flex-shrink-0" href="/">
-              <Image
-                src="/images/logo/logo.svg"
-                alt="Logo"
-                width={219}
-                height={36}
-              />
+              <div className="flex  justify-center items-center space-x-5">
+                <Image
+                  src="/images/logo/logo.jpg"
+                  alt="Logo"
+                  width={50}
+                  height={10}
+                />
+                <div>
+                  <div>Richard Sanches</div>
+                </div>
+              </div>
             </Link>
 
             <div className="max-w-[475px] w-full">
@@ -158,7 +180,10 @@ const Header = () => {
 
             <div className="flex w-full lg:w-auto justify-between items-center gap-5">
               <div className="flex items-center gap-5">
-                <Link href="/signin" className="flex items-center gap-2.5">
+                <div
+                  className="flex items-center gap-2.5"
+                  onClick={() => setOpen(true)}
+                >
                   <svg
                     width="24"
                     height="24"
@@ -184,11 +209,26 @@ const Header = () => {
                     <span className="block text-2xs text-dark-4 uppercase">
                       account
                     </span>
-                    <p className="font-medium text-custom-sm text-dark">
+                    <Button variant="outlined" onClick={handleOpenSignin}>
                       Sign In
-                    </p>
+                    </Button>
                   </div>
-                </Link>
+                </div>
+                {open && authForm === "signin" && (
+                  <Signin
+                    open={open}
+                    onClose={handleCloseModal}
+                    switchToSignup={handleOpenSignup}
+                  />
+                )}
+
+                {open && authForm === "signup" && (
+                  <Signup
+                    open={open}
+                    onClose={handleCloseModal}
+                    switchToSignin={handleOpenSignin}
+                  />
+                )}
 
                 <button
                   onClick={handleOpenCartModal}
