@@ -1,15 +1,16 @@
 "use client";
+
+import { useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { useCallback, useRef, useEffect } from "react";
-import data from "./categoryData";
-import Image from "next/image";
-
-// Import Swiper styles
 import "swiper/css/navigation";
 import "swiper/css";
 import SingleItem from "./SingleItem";
+import { Product } from "@/types/product";
+import Link from "next/link";
 
 const Categories = () => {
+  const [products, setProducts] = useState<Product[]>([]);
   const sliderRef = useRef(null);
 
   const handlePrev = useCallback(() => {
@@ -26,6 +27,13 @@ const Categories = () => {
     if (sliderRef.current) {
       sliderRef.current.swiper.init();
     }
+  }, []);
+
+    useEffect(() => {
+    fetch("http://localhost:8000/api/products")
+      .then((res) => res.json())
+      .then((data) => setProducts(data.data)) 
+      .catch((err) => console.error(err));
   }, []);
 
   return (
@@ -134,11 +142,14 @@ const Categories = () => {
               },
             }}
           >
-            {data.map((item, key) => (
-              <SwiperSlide key={key}>
-                <SingleItem item={item} />
+            {products.map((item) => (
+              <SwiperSlide key={item.id}>
+                <Link href={`/product/${item.id}`}>
+                  <SingleItem key={item.id} item={item} />
+                </Link>
               </SwiperSlide>
             ))}
+
           </Swiper>
         </div>
       </div>

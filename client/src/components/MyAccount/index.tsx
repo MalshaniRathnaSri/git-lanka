@@ -2,19 +2,19 @@
 import React, { useState } from "react";
 import Breadcrumb from "../Common/Breadcrumb";
 import Image from "next/image";
-import AddressModal from "./AddressModal";
+import ProfileModal from "./ProfileModal";
 import Orders from "../Orders";
 
 const MyAccount = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
-  const [addressModal, setAddressModal] = useState(false);
+  const [profileModal, setProfileModal] = useState(false);
 
-  const openAddressModal = () => {
-    setAddressModal(true);
+  const openProfileModal = () => {
+    setProfileModal(true);
   };
 
-  const closeAddressModal = () => {
-    setAddressModal(false);
+  const closeProfileModal = () => {
+    setProfileModal(false);
   };
 
   return (
@@ -313,7 +313,7 @@ const MyAccount = () => {
 
                   <button
                     className="text-dark ease-out duration-200 hover:text-blue"
-                    onClick={openAddressModal}
+                    onClick={openProfileModal}
                   >
                     <svg
                       className="fill-current"
@@ -445,7 +445,7 @@ const MyAccount = () => {
 
                   <button
                     className="text-dark ease-out duration-200 hover:text-blue"
-                    onClick={openAddressModal}
+                    onClick={openProfileModal}
                   >
                     <svg
                       className="fill-current"
@@ -721,7 +721,7 @@ const MyAccount = () => {
         </div>
       </section>
 
-      <AddressModal isOpen={addressModal} closeModal={closeAddressModal} />
+      <ProfileModal isOpen={profileModal} closeModal={closeProfileModal} />
     </>
   );
 };

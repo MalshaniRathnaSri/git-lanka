@@ -12,6 +12,7 @@ import Image from "next/image";
 import Button from "@mui/material/Button";
 import Signin from "../Auth/Signin";
 import Signup from "../Auth/Signup";
+import ProfileModal from "../MyAccount/ProfileModal";
 
 const Header = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -20,6 +21,10 @@ const Header = () => {
   const { openCartModal } = useCartModalContext();
   const [open, setOpen] = useState(false);
   const [authForm, setAuthForm] = useState("signin");
+  const [isProfileModalOpen, setProfileModalOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [authToken, setAuthToken] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const product = useAppSelector((state) => state.cartReducer.items);
   const totalPrice = useSelector(selectTotalPrice);
@@ -63,6 +68,9 @@ const Header = () => {
     { label: "Mouse", value: "6" },
     { label: "Tablet", value: "7" },
   ];
+
+  const handleOpenProfileModal = () => setProfileModalOpen(true);
+  const handleCloseProfileModal = () => setProfileModalOpen(false);
 
   return (
     <header
@@ -181,8 +189,11 @@ const Header = () => {
             <div className="flex w-full lg:w-auto justify-between items-center gap-5">
               <div className="flex items-center gap-5">
                 <div
-                  className="flex items-center gap-2.5"
-                  onClick={() => setOpen(true)}
+                  className="flex items-center gap-2.5 cursor-pointer"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleOpenProfileModal();
+                  }}
                 >
                   <svg
                     width="24"
@@ -204,11 +215,12 @@ const Header = () => {
                       fill="#3C50E0"
                     />
                   </svg>
-
+                </div>
+                <div
+                  className="flex items-center gap-2.5"
+                  onClick={() => setOpen(true)}
+                >
                   <div>
-                    <span className="block text-2xs text-dark-4 uppercase">
-                      account
-                    </span>
                     <Button variant="outlined" onClick={handleOpenSignin}>
                       Sign In
                     </Button>
@@ -227,6 +239,15 @@ const Header = () => {
                     open={open}
                     onClose={handleCloseModal}
                     switchToSignin={handleOpenSignin}
+                  />
+                )}
+
+                {isProfileModalOpen && (
+                  <ProfileModal
+                    isOpen={true}
+                    closeModal={() => setIsModalOpen(false)}
+                    user={currentUser}
+                    token={authToken}
                   />
                 )}
 

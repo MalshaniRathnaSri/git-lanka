@@ -59,7 +59,7 @@ const Signin = ({ open, onClose, switchToSignup }) => {
         localStorage.setItem("user", JSON.stringify(data.customer));
 
         onClose();
-        router.push("/"); 
+        router.push("/");
       }
     } catch (err) {
       setError(err.message);
@@ -121,7 +121,14 @@ const Signin = ({ open, onClose, switchToSignup }) => {
                   onSubmit={handleSubmit}
                   className="flex flex-col gap-5"
                 >
-                  <TextField autoFocus fullWidth label="Email" name="email" value={formData.email} onChange={handleChange} />
+                  <TextField
+                    autoFocus
+                    fullWidth
+                    label="Email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                  />
                   <TextField
                     fullWidth
                     label="Password"

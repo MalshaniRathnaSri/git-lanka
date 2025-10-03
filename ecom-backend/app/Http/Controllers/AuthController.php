@@ -69,6 +69,33 @@ class AuthController extends Controller
         ]);
     }
 
+    public function updateProfile(Request $request)
+    {
+        $user = $request->user();
+
+        $request->validate([
+            'fname' => 'sometimes|string|max:255',
+            'lname' => 'sometimes|string|max:255',
+            'email' => 'sometimes|email|unique:users,email,' . $user->id,
+            'contact' => 'sometimes|string|max:15',
+            'password' => 'nullable|string|min:6',
+        ]);
+
+        $user->update([
+            'fname' => $request->fname ?? $user->fname,
+            'lname' => $request->lname ?? $user->lname,
+            'email' => $request->email ?? $user->email,
+            'contact' => $request->contact ?? $user->contact,
+            'password' => $request->password ? Hash::make($request->password) : $user->password,
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Profile updated successfully!',
+            'user' => $user
+        ]);
+    }
+
     public function logout(Request $request) 
     {
         $request->user()->currentAccessToken()->delete();
