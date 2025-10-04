@@ -1,24 +1,42 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Card from "../dashboard/components/Cart";
+import Card from "../../../components/Card";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 
 export default function Dashboard() {
   const [totalProducts, setTotalProducts] = useState(0);
   const [totalCustomers, setTotalCustomers] = useState(0);
+  const [totalUsers, setTotalUsers] = useState(0);
+  const [activeUsers, setActiveUsers] = useState(0);
   const router = useRouter();
 
+  const token = localStorage.getItem("token");
+
   useEffect(() => {
-    setTotalProducts(120);
-    setTotalCustomers(58);
+    const fetchStats = async () => {
+      try {
+        const res = await axios.get("http://localhost:8000/api/admin/stats", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setTotalProducts(res.data.total_products);
+        setTotalCustomers(res.data.total_customers);
+        setTotalUsers(res.data.total_users);
+        setActiveUsers(res.data.active_users);
+      } catch (err) {
+        console.error("Failed to fetch stats", err);
+      }
+    };
+
+    fetchStats();
   }, []);
 
   return (
     <div className="p-8 min-h-screen bg-gray-100">
       <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card
           title="Total Products"
           value={totalProducts}
@@ -30,9 +48,14 @@ export default function Dashboard() {
           onClick={() => router.push("/admin/customers")}
         />
         <Card
-          title="Admin/User Profile"
-          value="-"
-          onClick={() => router.push("/admin/profile")}
+          title="Total Users"
+          value={totalUsers}
+          onClick={() => router.push("/admin/users")}
+        />
+        <Card
+          title="Active Users"
+          value={activeUsers}
+          onClick={() => router.push("/admin/users")}
         />
       </div>
 
@@ -47,9 +70,9 @@ export default function Dashboard() {
           </button>
           <button
             className="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 transition"
-            onClick={() => router.push("/admin/customers")}
+            onClick={() => router.push("/admin/users")}
           >
-            Manage Customers
+            Manage Users
           </button>
           <button
             className="bg-yellow-600 text-white py-2 px-4 rounded hover:bg-yellow-700 transition"
@@ -57,6 +80,7 @@ export default function Dashboard() {
           >
             Edit Profile
           </button>
+          
         </div>
       </div>
     </div>
