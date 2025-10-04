@@ -60,6 +60,67 @@ class AuthController extends Controller
         ]);
     }
 
+    public function adminRegister(Request $request)
+    {
+        $request->validate([
+            'fname' => 'required|string|max:255',
+            'lname' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'contact' => 'nullable|string|max:15',
+            'password' => 'required|string|min:6',
+            'privileges' => 'nullable|array',
+        ]);
+
+        $admin = User::create([
+            'fname' => $request->fname,
+            'lname' => $request->lname,
+            'email' => $request->email,
+            'contact' => $request->contact,
+            'password' => Hash::make($request->password),
+            'role' => 'admin',
+            'is_active' => true,
+            'privileges' => $request->privileges ?? [],
+        ]);
+
+        $token = $admin->createToken('admin-token')->plainTextToken;
+
+        return response()->json([
+            'message' => 'Admin registered successfully',
+            'admin' => $admin,
+            'token' => $token
+        ], 201);
+    }
+
+    public function adminLogin(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
+
+        $u = User::where('email', $request->email)->first();
+
+        if (!$u || !Hash::check($request->password, $u->password)) {
+            return response()->json(['message' => 'Invalid credentials'], 401);
+        }
+
+        if ($u->role !== 'admin') {
+            return response()->json(['message' => 'Unauthorized: not an admin'], 403);
+        }
+
+        if (! $u->is_active) {
+            return response()->json(['message' => 'Account deactivated'], 403);
+        }
+
+        $token = $u->createToken('admin-token')->plainTextToken;
+
+        return response()->json([
+            'message' => 'Admin login successful',
+            'admin' => $u,
+            'token' => $token
+        ]);
+    }
+
     public function profile(Request $request) 
     {
         return response()->json([

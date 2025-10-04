@@ -24,6 +24,9 @@ class User extends Authenticatable
         'contact',
         'email',
         'password',
+        'role',
+        'is_active',
+        'privileges',
     ];
 
     /**
@@ -46,6 +49,8 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_active' => 'boolean',
+            'privileges' => 'array',
         ];
     }
 }
